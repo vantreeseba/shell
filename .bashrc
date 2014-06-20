@@ -41,7 +41,7 @@ set_prompt () {
     White='\[\e[0;37m\]'        # White
 
     function parse_git_dirty {
-        StatusOutput=`LC_ALL=C git status -z 2>/dev/null`
+        StatusOutput=`LC_ALL=C git status --porcelain 2>/dev/null | cut -c-2`
         if [[ $StatusOutput == "" ]]; then
             return
         fi
