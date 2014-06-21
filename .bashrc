@@ -41,63 +41,59 @@ set_prompt () {
     White='\[\e[0;37m\]'        # White
 
     function parse_git_dirty {
-        StatusOutput=`LC_ALL=C git status --porcelain 2>/dev/null | cut -c-2`
-        if [[ $StatusOutput == "" ]]; then
-            return
+        #dump to a file, cause grep is retard.
+        local output=$(git status -sb 2>/dev/null)
+        if [[ $output != "" ]]; then
+
+            echo "$output" > ~/.git_status_tmp
+            #GREEEP
+            #untracked files
+            grep --mmap -Gq '^??' ~/.git_status_tmp && echo -n "$Yellow+" &
+            #added files
+            grep --mmap -Gq '^A.' ~/.git_status_tmp && echo -n "$Green+" &
+            #unadded modified files
+            grep --mmap -Gq '^.M' ~/.git_status_tmp && echo -n "$Yellow*" &
+            #added modified files
+            grep --mmap -Gq '^M.' ~/.git_status_tmp && echo -n "$Green*" &
+            #unadded deleted files
+            grep --mmap -Gq '^.D' ~/.git_status_tmp && echo -n "$Red-" &
+            #added deleted files
+            grep --mmap -Gq '^D.' ~/.git_status_tmp && echo -n "$Green-" &
+
+            wait
+            rm ~/.git_status_tmp &
         fi
-
-        echo -n " "
-
-        #test command
-        # git status --porcelain 2>/dev/null | cut -c-2 | uniq | LC_ALL=C grep --mmap -Fq "??"
-
-        #untracked files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz "??" && echo -n "$Yellow+"
-
-        #added files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz "A " && echo -n "$Green+"
-
-        #unadded modified files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz " M" && echo -n "$Yellow*"
-
-        #added modified files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz "M " && echo -n "$Green*"
-
-        #unadded deleted files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz " D" && echo -n "$Red-"
-
-        #added deleted files
-        echo "$StatusOutput" | LC_ALL=C grep --mmap -Fqz "D " && echo -n "$Green-"
     }
 
     function parse_git_branch {
-      git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e "s/* \(.*\)/\1/"
+      git rev-parse --abbrev-ref HEAD 2>/dev/null
     }
 
     PS1="\n"
-
     Host="\\h"
     UserAtHost="\\u@\\h"
-    ShortDir="\\W"
-
-    if [[ $ExitStatus != 0 ]]; then
-        PS1+="$Red$ExitStatus "
-    fi
+    ShortDir="\\w"
 
     if [[ $EUID == 0 ]]; then
-        PS1+="$Red$Host"
-    else
-        PS1+="$Green$UserAtHost"
+        ExecuteSymbol="$Red#"
+     else
+        ExecuteSymbol="$Green>"
     fi
 
-    PS1+=" $Blue$ShortDir "
+    PS1+="$Yellow$ShortDir"
 
     ParsedBranch=$(parse_git_branch)
-    if [[ $ParsedBranch != "" ]]; then
+    if [[ $ParsedBranch ]]; then
         PS1+="$Reset[$ParsedBranch$(parse_git_dirty)$Reset]"
     fi
 
-    PS1+="$Reset$ "
+    PS1+="\n"
+
+    if [[ $ExitStatus != 0 ]]; then
+        PS1+="$Red$ExitStatus"
+    fi
+
+    PS1+="$ExecuteSymbol$Reset"
 }
 
 PROMPT_COMMAND='set_prompt'
