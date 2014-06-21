@@ -16,8 +16,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=500
-HISTFILESIZE=500
+HISTSIZE=5000
+HISTFILESIZE=5000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -26,6 +26,7 @@ shopt -s checkwinsize
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 #shopt -s globstar
+shopt -s extglob
 
 set_prompt () {
     ExitStatus=$?
@@ -40,33 +41,65 @@ set_prompt () {
     Cyan='\[\e[0;36m\]'         # Cyan
     White='\[\e[0;37m\]'        # White
 
+    function get_upstream_diff {
+        # Find how many commits we are ahead/behind our upstream
+
+        local upstream=$(git rev-parse --abbrev-ref ${parsed_branch}@{upstream})
+        local count="$(git rev-list --count --left-right ${upstream}...HEAD 2>/dev/null)"
+        local ahead="${count:(-1)}"
+        local behind="${count:0:1}"
+
+        # calculate the result
+        case "$count" in
+        "") # no upstream
+            diff="" ;;
+        0*0) # equal to upstream
+            diff="=" ;;
+        0*) # ahead of upstream
+            diff="$Green+${ahead}" ;;
+        *"  0") # behind upstream
+            diff="$Yellowe-${behind}" ;;
+        *)      # diverged from upstream
+            diff="$Red+${ahead}-${behind}" ;;
+        esac
+
+        echo $diff
+    }
+
     function parse_git_dirty {
-        #dump to a file, cause grep is retard.
-        local output=$(git status -sb 2>/dev/null)
-        if [[ $output != "" ]]; then
+        #changes in index
+        git diff-index --cached --quiet --diff-filter=A HEAD 2>/dev/null
+        if [[ $? != 0 ]]; then
+            echo -n "$Green+"
+        fi
 
-            echo "$output" > ~/.git_status_tmp
-            #GREEEP
-            #untracked files
-            grep --mmap -Gq '^??' ~/.git_status_tmp && echo -n "$Yellow+" &
-            #added files
-            grep --mmap -Gq '^A.' ~/.git_status_tmp && echo -n "$Green+" &
-            #unadded modified files
-            grep --mmap -Gq '^.M' ~/.git_status_tmp && echo -n "$Yellow*" &
-            #added modified files
-            grep --mmap -Gq '^M.' ~/.git_status_tmp && echo -n "$Green*" &
-            #unadded deleted files
-            grep --mmap -Gq '^.D' ~/.git_status_tmp && echo -n "$Red-" &
-            #added deleted files
-            grep --mmap -Gq '^D.' ~/.git_status_tmp && echo -n "$Green-" &
+        git diff-index --cached --quiet --diff-filter=M HEAD 2>/dev/null
+        if [[ $? != 0 ]]; then
+            echo -n "$Green*"
+        fi
 
-            wait
-            rm ~/.git_status_tmp &
+        git diff --quiet 2>/dev/null
+        if [[ $? != 0 ]]; then
+            echo -n "$Yellow*"
+        fi
+
+        if [[ $(git ls-files --exclude-standard --others 2>/dev/null) != "" ]]; then
+            echo -n "${Yellow}+"
         fi
     }
 
     function parse_git_branch {
       git rev-parse --abbrev-ref HEAD 2>/dev/null
+    }
+
+    function display_git_status {
+        parsed_branch=$(parse_git_branch)
+        if [[ $parsed_branch ]]; then
+            parsed_branch="${parsed_branch}"
+            # upstream_diff=$(get_upstream_diff)
+            dirty_status=$(parse_git_dirty)
+            echo "${Reset}[${White}${parsed_branch} ${dirty_status}${Reset}]"
+        fi
     }
 
     PS1="\n"
@@ -80,20 +113,13 @@ set_prompt () {
         ExecuteSymbol="$Green>"
     fi
 
-    PS1+="$Yellow$ShortDir"
-
-    ParsedBranch=$(parse_git_branch)
-    if [[ $ParsedBranch ]]; then
-        PS1+="$Reset[$ParsedBranch$(parse_git_dirty)$Reset]"
-    fi
-
-    PS1+="\n"
+    PS1+="${Yellow}${ShortDir}$(display_git_status)\n"
 
     if [[ $ExitStatus != 0 ]]; then
-        PS1+="$Red$ExitStatus"
+        PS1+="${Red}${ExitStatus}"
     fi
 
-    PS1+="$ExecuteSymbol$Reset"
+    PS1+="${ExecuteSymbol}${Reset}"
 }
 
 PROMPT_COMMAND='set_prompt'
