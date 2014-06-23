@@ -97,8 +97,8 @@ set_prompt () {
         if [[ $parsed_branch ]]; then
             parsed_branch="${parsed_branch}"
             # upstream_diff=$(get_upstream_diff)
-            dirty_status=$(parse_git_dirty)
-            echo "${Reset}[${White}${parsed_branch} ${dirty_status}${Reset}]"
+            # dirty_status=$(parse_git_dirty)
+            echo "${Reset}[${White}${parsed_branch}${Reset}]"
         fi
     }
 
