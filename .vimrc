@@ -97,8 +97,6 @@ set noerrorbells
 set modeline
 set ls=2
 
-" Turn off line wrapping
-set nowrap
 
 " Enable syntax
 syntax on 
@@ -134,6 +132,11 @@ augroup END
 
 :nnoremap s :exec "normal i".nr2char(getchar())."\e"<CR>
 :nnoremap S :exec "normal a".nr2char(getchar())."\e"<CR>
+
+"make space toggle folds
+:nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
+:vnoremap <Space> zf
+
 
 "selection shortcuts
 :map <leader>a 1GvGG$ " select whole file in visual mode
@@ -265,8 +268,8 @@ inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
 let g:ctrlp_custom_ignore = {
-	\ 'dir':'node_modules$\|\.git$'
+	\ 'dir':'node_modules$\|\.git$\|bin$'
 	\ }
 
-
-
+" Turn off line wrapping
+set nowrap
