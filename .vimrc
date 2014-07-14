@@ -48,12 +48,10 @@ NeoBundle 'ervandew/supertab'
 NeoBundle 'wincent/command-t'
 NeoBundle 'jdonaldson/vaxe'
 NeoBundle 'kien/ctrlp.vim'
+NeoBundle 'maksimr/vim-jsbeautify'
 
 " Required:
 call neobundle#end()
-
-" Required:
-filetype plugin indent on
 
 " If there are uninstalled bundles found on startup,
 " this will conveniently prompt you to install them.
@@ -72,13 +70,10 @@ set number
 
 " hide buffers instead of closing and forcing a save
 set hidden
-
 set nobackup
 
-" Highlight search results
+" Highlight search results && hightlight as you type
 set hlsearch
-
-" Highlight text as you type in a search
 set incsearch
 
 " Disable the arrow keys like a baus.
@@ -97,15 +92,13 @@ set noerrorbells
 set modeline
 set ls=2
 
-
 " Enable syntax
 syntax on 
 filetype plugin indent on
 
 " Wrapping and display lines
-set textwidth=80
+" set textwidth=80
 set colorcolumn=80
-
 set cindent
 
 " Insert tab characters represetned (others)
@@ -244,32 +237,37 @@ let g:neocomplete#sources#dictionary#dictionaries = {
 "inoremap <expr><TAB>  pumvisible() ? "\<Down>" : "\<C-x>\<C-u>"
 
 " Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+" autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+" autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+" autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+" autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+" autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 
 " Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-  let g:neocomplete#sources#omni#input_patterns = {}
-endif
+" if !exists('g:neocomplete#sources#omni#input_patterns')
+"   let g:neocomplete#sources#omni#input_patterns = {}
+" endif
 "let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
 "let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
 "let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
 
 " For perlomni.vim setting.
 " https://github.com/c9s/perlomni.vim
-let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+" let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
 
 " better tab completion shit
 set completeopt=longest,menuone
-inoremap <expr> <CR> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
-inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? "\<lt>Down>" : ""<CR>'
+"inoremap <expr> <CR> pumvisible() ? '<C-y>' : '<C-g>u<CR>'
+"inoremap <expr> <C-n> pumvisible() ? '<C-n>' : '<C-n><C-r>=pumvisible() ? <lt>Down> : <CR>'
+"inoremap <expr> <M-,> pumvisible() ? '<C-n>' : '<C-x><C-o><C-n><C-p><C-r>=pumvisible() ? <lt>Down> : <CR>'
+
+" ctrlp options
 let g:ctrlp_custom_ignore = {
 	\ 'dir':'node_modules$\|\.git$\|bin$'
 	\ }
 
 " Turn off line wrapping
 set nowrap
+
+" jsbeautify settings
+autocmd FileType javascript map <buffer> = :call JsBeautify()<CR>
