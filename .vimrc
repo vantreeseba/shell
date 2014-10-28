@@ -102,6 +102,15 @@ set noexpandtab shiftwidth=4 tabstop=4
 map <leader>n :NERDTreeToggle<CR>
 map <leader>m :NERDTreeMirror<CR>
 
+" Map taglist to leader 
+map <leader>t :TlistToggle<CR>
+
+" map some window movements
+nmap <silent> <A-k> :wincmd k<CR>
+nmap <silent> <A-j> :wincmd j<CR>
+nmap <silent> <A-h> :wincmd h<CR>
+nmap <silent> <A-l> :wincmd l<CR>
+
 " Set up folding
 augroup vimrc
   au BufReadPre * setlocal foldmethod=indent
