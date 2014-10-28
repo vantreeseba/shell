@@ -157,7 +157,6 @@ if ! shopt -oq posix; then
   fi
 fi
 
-
 # Deal with history in multiple terminals
 # avoid duplicates..
 export HISTCONTROL=ignoredups:erasedups
