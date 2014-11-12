@@ -4,9 +4,10 @@
 
 # If not running interactively, don't do anything
 case $- in
-    *i*) ;;
-      *) return;;
+  *i*) ;;
+     *) return;;
 esac
+
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -68,23 +69,30 @@ set_prompt () {
 
     function parse_git_dirty {
         #changes in index
+
+        output=""
+
         git diff-index --cached --quiet --diff-filter=A HEAD 2>/dev/null
         if [[ $? != 0 ]]; then
-            echo -n "$Green+"
+            output="$output$Green+"
         fi
 
         git diff-index --cached --quiet --diff-filter=M HEAD 2>/dev/null
         if [[ $? != 0 ]]; then
-            echo -n "$Green*"
+            output="$output$Green*"
         fi
 
         git diff --quiet 2>/dev/null
         if [[ $? != 0 ]]; then
-            echo -n "$Yellow*"
+            output="$output$Yellow*"
         fi
 
         if [[ $(git ls-files --exclude-standard --others 2>/dev/null) != "" ]]; then
-            echo -n "${Yellow}+"
+            output="$output${Yellow}+"
+        fi
+
+        if [ $output ]; then
+            echo -n " $output"
         fi
     }
 
@@ -96,9 +104,10 @@ set_prompt () {
         parsed_branch=$(parse_git_branch)
         if [[ $parsed_branch ]]; then
             parsed_branch="${parsed_branch}"
-            # upstream_diff=$(get_upstream_diff)
-            # dirty_status=$(parse_git_dirty)
-            echo "${Reset} [${Yellow}${parsed_branch}${Reset}]"
+#            upstream_diff=$(get_upstream_diff)
+#           dirty_status=$(parse_git_dirty)
+#echo "${Reset} [${Yellow}${parsed_branch}${dirty_status}${Reset}]"
+echo "${Reset} [${Yellow}${parsed_branch}${Reset}]"
         fi
     }
 
