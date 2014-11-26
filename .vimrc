@@ -165,8 +165,11 @@ augroup END
 
 " Quick access to buffer search
 map <leader>, :buffer<Space>
+noremap <C-h> :bp<CR>
 noremap <C-j> :bp<CR>
+noremap <C-l> :bn<CR>
 noremap <C-k> :bn<CR>
+noremap <C-d> :bd<CR>
 noremap <leader>c :bd<CR>
 
 nnoremap s :exec "normal i".nr2char(getchar())."\e"<CR>
@@ -307,3 +310,31 @@ function! Multiple_cursors_after()
 		exe 'NeoCompleteUnlock'
 	endif
 endfunction
+
+:map <M-Esc>[62~ <ScrollWheelUp>
+:map! <M-Esc>[62~ <ScrollWheelUp>
+:map <M-Esc>[63~ <ScrollWheelDown>
+:map! <M-Esc>[63~ <ScrollWheelDown>
+:map <M-Esc>[64~ <S-ScrollWheelUp>
+:map! <M-Esc>[64~ <S-ScrollWheelUp>
+:map <M-Esc>[65~ <S-ScrollWheelDown>
+:map! <M-Esc>[65~ <S-ScrollWheelDown>
+
+set mouse=a
+
+noremap <ScrollWheelUp>     4<C-Y>
+noremap <ScrollWheelDown>   4<C-E>
+noremap <S-ScrollWheelUp>   <C-B>
+noremap <S-ScrollWheelDown> <C-F>
+noremap <C-ScrollWheelUp>   <C-U>
+noremap <C-ScrollWheelDown> <C-D>
+noremap <M-ScrollWheelUp>   <C-Y>
+noremap <M-ScrollWheelDown> <C-E>
+inoremap <ScrollWheelUp>     <C-O>4<C-Y>
+inoremap <ScrollWheelDown>   <C-O>4<C-E>
+inoremap <S-ScrollWheelUp>   <C-O><C-B>
+inoremap <S-ScrollWheelDown> <C-O><C-F>
+inoremap <C-ScrollWheelUp>   <C-O><C-U>
+inoremap <C-ScrollWheelDown> <C-O><C-D>
+inoremap <M-ScrollWheelUp>   <C-O><C-Y>
+inoremap <M-ScrollWheelDown> <C-O><C-E>
