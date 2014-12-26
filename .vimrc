@@ -2,23 +2,20 @@ if !empty($CONEMUBUILD)
 	set term=xterm 
 	set t_Co=256 
 	let &t_AB="\e[48;5;%dm" 
-	let &t_AF="\e[38;5;%dm" 
+	let &t_AF="\e[38;5;%dm"
+	set encoding=utf-8
+	set fileencoding=utf-8
+	set termencoding=utf-8
 endif 
-
-" Set up NeoBundle as well
-" source /home/jhare/.vim/vimrcs/neobundle-setup.vim
 
 "NeoBundle Scripts-----------------------------
 if has('vim_starting')
-	" Required:
 	set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
 
-" Required:
 call neobundle#begin(expand('~/.vim/bundle'))
 
 " Let NeoBundle manage NeoBundle
-" Required:
 NeoBundleFetch 'Shougo/neobundle.vim'
 
 NeoBundle 'Shougo/vimproc.vim', {
@@ -47,9 +44,10 @@ NeoBundle 'scrooloose/nerdcommenter'
 NeoBundle 'kristijanhusak/vim-multiple-cursors'
 NeoBundle 'bling/vim-airline'
 NeoBundle 'sheerun/vim-polyglot'
-NeoBundleLazy 'maksimr/vim-jsbeautify', {'autoload':{'filetypes':['javascript']}} 
+NeoBundle 'editorconfig/editorconfig'
+NeoBundle 'Chiel92/vim-autoformat'
+NeoBundle 'airblade/vim-gitgutter'
 
-" Required:
 call neobundle#end()
 
 " If there are uninstalled bundles found on startup,
@@ -82,9 +80,9 @@ set ignorecase
 set smartcase
 
 " Encoding
-set bomb
-set ttyfast
-set binary
+"set bomb
+"set ttyfast
+"set binary
 
 " Fat finger fixes
 cnoreabbrev W! w!
@@ -126,12 +124,14 @@ set title
 set titleold="Terminal"
 set titlestring=%F
 
-
 "" Airline Settings
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
 
-let g:airline_theme = 'powerlineish'
+let g:airline_theme = 'zenburn'
 let g:airline_enable_branch = 1
+"let g:airline_powerline_fonts = 1
+let g:airline_left_sep = ""
+let g:airline_right_sep = ""
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
@@ -157,35 +157,22 @@ nmap <silent> <A-j> :wincmd j<CR>
 nmap <silent> <A-h> :wincmd h<CR>
 nmap <silent> <A-l> :wincmd l<CR>
 
-" Set up folding
-augroup vimrc
-	au BufReadPre * setlocal foldmethod=indent
-	au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+"Set up folding
+augroup folding
+	"	au BufReadPre * setlocal foldmethod=indent
+	"	au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
 augroup END
 
 " Quick access to buffer search
 map <leader>, :buffer<Space>
 noremap <C-h> :bp<CR>
-noremap <C-j> :bp<CR>
 noremap <C-l> :bn<CR>
-noremap <C-k> :bn<CR>
 noremap <C-d> :bd<CR>
 noremap <leader>c :bd<CR>
-
-nnoremap s :exec "normal i".nr2char(getchar())."\e"<CR>
-nnoremap S :exec "normal a".nr2char(getchar())."\e"<CR>
 
 "make space toggle folds
 nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
 vnoremap <Space> zf
-
-"selection shortcuts
-map <leader>a 1GvGG$ 
-map <leader>f 1GvGG$= 
-
-"indent all the things
-nnoremap <C-=> gg=G2<C-o> 
-inoremap <C-=> <ESC>gg=G2<C-o>i
 
 " Find .jshintrc for Syntastic
 function s:find_jshintrc(dir)
@@ -212,21 +199,21 @@ endfunction
 " set up jshint
 au FileType javascript call UpdateJsHintConf()
 
-" jsbeautify settings
-autocmd FileType javascript map <buffer> <C-=> :call JsBeautify()<CR>
-let editor_config = getcwd() . '\.editorconfig'
-if filereadable(editor_config)
-	let g:editorconfig_Beautifier = getcwd() . '\.editorconfig'
-endif
+" auto-format
+noremap <C-=> :Autoformat<CR><CR>
+inoremap <C-=> <ESC>:Autoformat<CR><CR>i
+
+"astyle options for autoformat
+let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8z2s".&shiftwidth'
 
 autocmd BufEnter * :syntax sync fromstart
 set autoread
 
 let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='?'
-let g:syntastic_warning_symbol='?'
-let g:syntastic_style_error_symbol = '?'
-let g:syntastic_style_warning_symbol = '?'
+let g:syntastic_error_symbol='X'
+let g:syntastic_warning_symbol='!'
+let g:syntastic_style_error_symbol = 'X'
+let g:syntastic_style_warning_symbol = '!'
 let g:syntastic_auto_loc_list=1
 let g:syntastic_aggregate_errors = 1
 
@@ -263,6 +250,8 @@ if !exists('g:neocomplete#sources#omni#input_patterns')
 	let g:neocomplete#sources#omni#input_patterns = {}
 endif
 
+"let g:neocomplete#force_omni_input_patterns.javascript = '[^. \t]\.\w*'
+
 " neocomplete key-mappings.
 inoremap <expr><C-g> neocomplete#undo_completion()
 inoremap <expr><C-l> neocomplete#complete_common_string()
@@ -278,12 +267,13 @@ let g:unite_enable_start_insert = 1
 let g:unite_split_rule = "botright"
 let g:unite_force_overwrite_statusline = 0
 let g:unite_winheight = 10
-
+let g:unite_source_rec_async_command =
+			\ 'ag --follow --nocolor --nogroup --hidden -g ""'
 call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 " Replace ctrlp
-nnoremap <C-P> :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/git<cr>
+nnoremap <C-P> :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/async:!<cr>
 
 " When buffer/file is unite, add new mappings
 autocmd FileType unite call s:unite_settings()
@@ -311,30 +301,4 @@ function! Multiple_cursors_after()
 	endif
 endfunction
 
-:map <M-Esc>[62~ <ScrollWheelUp>
-:map! <M-Esc>[62~ <ScrollWheelUp>
-:map <M-Esc>[63~ <ScrollWheelDown>
-:map! <M-Esc>[63~ <ScrollWheelDown>
-:map <M-Esc>[64~ <S-ScrollWheelUp>
-:map! <M-Esc>[64~ <S-ScrollWheelUp>
-:map <M-Esc>[65~ <S-ScrollWheelDown>
-:map! <M-Esc>[65~ <S-ScrollWheelDown>
-
 set mouse=a
-
-noremap <ScrollWheelUp>     4<C-Y>
-noremap <ScrollWheelDown>   4<C-E>
-noremap <S-ScrollWheelUp>   <C-B>
-noremap <S-ScrollWheelDown> <C-F>
-noremap <C-ScrollWheelUp>   <C-U>
-noremap <C-ScrollWheelDown> <C-D>
-noremap <M-ScrollWheelUp>   <C-Y>
-noremap <M-ScrollWheelDown> <C-E>
-inoremap <ScrollWheelUp>     <C-O>4<C-Y>
-inoremap <ScrollWheelDown>   <C-O>4<C-E>
-inoremap <S-ScrollWheelUp>   <C-O><C-B>
-inoremap <S-ScrollWheelDown> <C-O><C-F>
-inoremap <C-ScrollWheelUp>   <C-O><C-U>
-inoremap <C-ScrollWheelDown> <C-O><C-D>
-inoremap <M-ScrollWheelUp>   <C-O><C-Y>
-inoremap <M-ScrollWheelDown> <C-O><C-E>
