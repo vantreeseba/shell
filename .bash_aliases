@@ -1,40 +1,70 @@
 # make less more friendly for non-text input files, see lesspipe(1)
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
-# enable color support of ls and also add handy aliases
-# if [ -x /usr/bin/dircolors ]; then
+# turn off globbing, this messes up the file arrays
+set -f
 
-# test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)
-	LS_COLORS="di=0;36:ex=1;32:fi=1;30"
+add_to_ls_colors(){
+	declare -a files=(${!1})
+		color=$2
 
-#code files
-	LS_COLORS+=":*.js=1;35"
-	LS_COLORS+=":*.c=1;35"
-	LS_COLORS+=":*.cpp=1;35"
+		for i in ${files[@]}; do
+			LS_COLORS+=":$i=$color"
+				done;
+}
 
-#code/build files
-	LS_COLORS+=":*rakefile=0;35"
-	LS_COLORS+=":*gulpfile.js=0;35"
+LS_COLORS="di=0;36:ex=1;32:fi=1;30"
 
-#key value files
-	LS_COLORS+=":*.json=0;33"
-	LS_COLORS+=":*Gemfile=0;33"
-	LS_COLORS+=":*Gemfile.lock=0;33"
+code_color="1;35"
+code_files=(
+		"*.js"
+		"*.c"
+		"*.cpp"
+		"*.hx"
+		)
 
-#key value config/hidden files
-	LS_COLORS+=":*.gitignore=1;33"
-	LS_COLORS+=":*.jshintrc=1;33"
+task_build_color="0;35"
+task_build_files=(
+		"*rakefile"
+		"*gulpfile.js"
+		"*.hxml"
+		)
 
-#markup text
-	LS_COLORS+=":*.md=0;32"
+key_value_color="0;33"
+key_value_files=(
+		"*.json"
+		)
 
-	export LS_COLORS
-    alias ls='ls --color=auto'
-    alias l='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
+hidden_config_color="1;33"
+hidden_config_files=(
+		"*.gitignore"
+		"*.jshintrc"
+		"*.agignore"
+		"*.bash_aliases"
+		"*.bashrc"
+		"*.editorconfig"
+		"*.jsbeautifyrc"
+		"*.vimrc"
+		)
 
-    # alias grep='grep --color=auto'
-    # alias fgrep='fgrep --color=auto'
-    # alias egrep='egrep --color=auto'
-# fi
+marked_up_text_color="0;32"
+marked_up_text_files=(
+		"*.md"
+		"*.htm"
+		"*.html"
+		)
+
+add_to_ls_colors "code_files[@]" $code_color
+add_to_ls_colors "task_build_files[@]" $task_build_color
+add_to_ls_colors "key_value_files[@]" $key_value_color
+add_to_ls_colors "hidden_config_files[@]" $hidden_config_color
+add_to_ls_colors "marked_up_text_files[@]" $marked_up_text_color
+
+export LS_COLORS
+
+alias ls='ls --color=auto'
+alias l='ls --color=auto'
+
+#turn globbing back on
+set +f
+

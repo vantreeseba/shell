@@ -1,12 +1,18 @@
-if !empty($CONEMUBUILD) 
-	set term=xterm 
-	set t_Co=256 
-	let &t_AB="\e[48;5;%dm" 
-	let &t_AF="\e[38;5;%dm"
-	set encoding=utf-8
-	set fileencoding=utf-8
-	set termencoding=utf-8
-endif 
+if !empty($CONEMUBUILD)
+	" 256 color terminal is possible in Windows using ConEmu
+	set term=xterm
+	set termencoding=default    " not an 8-bit terminal
+	set t_Co=256
+	let &t_AB="\e[48;5;%dm" " set ANSI background color
+	let &t_AF="\e[38;5;%dm" " set ANSI foreground color
+	let &t_ZH="\e[3m"       " start italics
+	let &t_ZR="\e[23m"      " end italics
+	let &t_us="\e[4m"       " start underline
+	let &t_ue="\e[24m"      " end underline
+	" Windows console Vim really doesn't handle unicode well
+"	set listchars=tab:>-,eol:ª,trail:úp:úcedes:®,extends:¯
+endif
+
 
 "NeoBundle Scripts-----------------------------
 if has('vim_starting')
@@ -47,6 +53,7 @@ NeoBundle 'sheerun/vim-polyglot'
 NeoBundle 'editorconfig/editorconfig'
 NeoBundle 'Chiel92/vim-autoformat'
 NeoBundle 'airblade/vim-gitgutter'
+NeoBundle 'flazz/vim-colorschemes'
 
 call neobundle#end()
 
@@ -174,31 +181,6 @@ noremap <leader>c :bd<CR>
 nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
 vnoremap <Space> zf
 
-" Find .jshintrc for Syntastic
-function s:find_jshintrc(dir)
-	let l:found = globpath(a:dir, '.jshintrc')
-	if filereadable(l:found)
-		return l:found
-	endif
-
-	let l:parent = fnamemodify(a:dir, ':h')
-	if l:parent != a:dir
-		return s:find_jshintrc(l:parent)
-	endif
-
-	return "~/.jshintrc"
-endfunction
-
-" Get/Load jshintrc for jshint
-function UpdateJsHintConf()
-	let l:dir = expand('%:p:h')
-	let l:jshintrc = s:find_jshintrc(l:dir)
-	let g:syntastic_javascript_jshint_args = '--config' + l:jshintrc
-endfunction
-
-" set up jshint
-au FileType javascript call UpdateJsHintConf()
-
 " auto-format
 noremap <C-=> :Autoformat<CR><CR>
 inoremap <C-=> <ESC>:Autoformat<CR><CR>i
@@ -209,12 +191,12 @@ let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8z2s".&shiftwidth'
 autocmd BufEnter * :syntax sync fromstart
 set autoread
 
+let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_error_symbol='X'
 let g:syntastic_warning_symbol='!'
 let g:syntastic_style_error_symbol = 'X'
 let g:syntastic_style_warning_symbol = '!'
-let g:syntastic_auto_loc_list=1
 let g:syntastic_aggregate_errors = 1
 
 " vim-airline
@@ -274,6 +256,12 @@ call unite#filters#sorter_default#use(['sorter_rank'])
 
 " Replace ctrlp
 nnoremap <C-P> :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/async:!<cr>
+
+"search content
+let g:unite_source_grep_command = 'ag'
+let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --smart-case'
+let g:unite_source_grep_recursive_opt = ''
+nnoremap <Leader>/ :<C-u>Unite -silent -buffer-name=ag grep:.<CR>
 
 " When buffer/file is unite, add new mappings
 autocmd FileType unite call s:unite_settings()
