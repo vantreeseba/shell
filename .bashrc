@@ -8,11 +8,6 @@ case $- in
      *) return;;
 esac
 
-#export TERM=xterm
-
-# Run to change code page to unicode in windows.
-# ~/bin/chcp.com 65001
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -24,10 +19,7 @@ shopt -s histappend
 HISTSIZE=5000
 HISTFILESIZE=5000
 
-#try and fix misspelled dirs when cding
-#shopt -s cdspell
-
-#checkhash
+#I think this checks the command hash for already run commands?
 shopt -s checkhash
 shopt -s no_empty_cmd_completion
 
@@ -37,7 +29,7 @@ shopt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
-#shopt -s globstar
+#shopt -s globstar #only available in bash 4.0 I think.
 shopt -s extglob
 
 set_prompt () {
@@ -149,10 +141,6 @@ PROMPT_COMMAND='set_prompt'
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
 	. ~/.bash_aliases
 fi
@@ -182,9 +170,3 @@ fi
 export HISTCONTROL=ignoredups:erasedups
 # append history entries..
 shopt -s histappend
-
-
-#function EXT_COLOR () { echo -ne "\[\033[38;5;$1m\]"; }
-
-# set a fancy prompt
-#export PS1="`EXT_COLOR 172`[\u@\h \W]\$${NO_COLOUR} "
