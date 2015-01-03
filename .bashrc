@@ -8,7 +8,7 @@ case $- in
      *) return;;
 esac
 
-export TERM=msys
+#export TERM=xterm
 
 # Run to change code page to unicode in windows.
 # ~/bin/chcp.com 65001
@@ -23,6 +23,13 @@ shopt -s histappend
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
 HISTSIZE=5000
 HISTFILESIZE=5000
+
+#try and fix misspelled dirs when cding
+#shopt -s cdspell
+
+#checkhash
+shopt -s checkhash
+shopt -s no_empty_cmd_completion
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.

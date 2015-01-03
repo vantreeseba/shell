@@ -50,7 +50,7 @@ NeoBundle 'scrooloose/nerdcommenter'
 NeoBundle 'kristijanhusak/vim-multiple-cursors'
 NeoBundle 'bling/vim-airline'
 NeoBundle 'sheerun/vim-polyglot'
-NeoBundle 'editorconfig/editorconfig'
+NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'Chiel92/vim-autoformat'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'flazz/vim-colorschemes'
@@ -152,7 +152,7 @@ let g:nerdtree_tabs_focus_on_files=1
 let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 20
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
-map <leader>n :NERDTreeToggle<CR> 
+map <leader>n :NERDTreeToggle<CR>
 map <leader>m :NERDTreeMirror<CR>
 
 " Disable conceal
