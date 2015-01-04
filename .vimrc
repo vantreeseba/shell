@@ -9,10 +9,7 @@ if !empty($CONEMUBUILD)
 	let &t_ZR="\e[23m"      " end italics
 	let &t_us="\e[4m"       " start underline
 	let &t_ue="\e[24m"      " end underline
-	" Windows console Vim really doesn't handle unicode well
-"	set listchars=tab:>-,eol:ª,trail:úp:úcedes:®,extends:¯
 endif
-
 
 "NeoBundle Scripts-----------------------------
 if has('vim_starting')
@@ -87,9 +84,9 @@ set ignorecase
 set smartcase
 
 " Encoding
-"set bomb
-"set ttyfast
-"set binary
+set bomb
+set ttyfast
+set binary
 
 " Fat finger fixes
 cnoreabbrev W! w!
@@ -131,17 +128,39 @@ set title
 set titleold="Terminal"
 set titlestring=%F
 
+" map some window movements (ALT + movments)
+nmap <silent> <A-k> :wincmd k<CR>
+nmap <silent> <A-j> :wincmd j<CR>
+nmap <silent> <A-h> :wincmd h<CR>
+nmap <silent> <A-l> :wincmd l<CR>
+
+"Set up folding
+augroup folding
+	au BufReadPre * setlocal foldmethod=indent
+	au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+augroup END
+
+" Quick access to buffer search
+map <leader>, :buffer<Space>
+noremap <C-h> :bp<CR>
+noremap <C-l> :bn<CR>
+noremap <C-d> :bd<CR>
+
+"make space toggle folds
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
+vnoremap <Space> zf
+
+""""""""""""""""""""""""""" PLUGIN SETTINGS """"""""""""""""""""""""""""""""""
 "" Airline Settings
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
-
 let g:airline_theme = 'zenburn'
 let g:airline_enable_branch = 1
-"let g:airline_powerline_fonts = 1
 let g:airline_left_sep = ""
 let g:airline_right_sep = ""
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline_enable_syntastic = 1
 
 "" NERDTree configuration
 let g:NERDTreeChDirMode=2
@@ -158,39 +177,14 @@ map <leader>m :NERDTreeMirror<CR>
 " Disable conceal
 let g:vim_json_syntax_conceal = 0
 
-" map some window movements (ALT + movments)
-nmap <silent> <A-k> :wincmd k<CR>
-nmap <silent> <A-j> :wincmd j<CR>
-nmap <silent> <A-h> :wincmd h<CR>
-nmap <silent> <A-l> :wincmd l<CR>
-
-"Set up folding
-augroup folding
-	"	au BufReadPre * setlocal foldmethod=indent
-	"	au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
-augroup END
-
-" Quick access to buffer search
-map <leader>, :buffer<Space>
-noremap <C-h> :bp<CR>
-noremap <C-l> :bn<CR>
-noremap <C-d> :bd<CR>
-noremap <leader>c :bd<CR>
-
-"make space toggle folds
-nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
-vnoremap <Space> zf
-
-" auto-format
+" Autoformat Settings
 noremap <C-=> :Autoformat<CR><CR>
 inoremap <C-=> <ESC>:Autoformat<CR><CR>i
-
-"astyle options for autoformat
 let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8z2s".&shiftwidth'
 
+" Syntastic Settings
 autocmd BufEnter * :syntax sync fromstart
 set autoread
-
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_error_symbol='X'
@@ -198,9 +192,6 @@ let g:syntastic_warning_symbol='!'
 let g:syntastic_style_error_symbol = 'X'
 let g:syntastic_style_warning_symbol = '!'
 let g:syntastic_aggregate_errors = 1
-
-" vim-airline
-let g:airline_enable_syntastic = 1
 
 " set up omnifuncs
 au FileType css setlocal omnifunc=csscomplete#CompleteCSS
@@ -211,6 +202,7 @@ au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
 au FileType haxe setlocal omnifunc=vaxe#HaxeComplete
 au FileType * setlocal omnifunc=syntaxcomplete#Complete
 
+" Neocomplete Settings
 let g:acp_enableAtStartup = 0
 let g:neocomplete#enable_at_startup = 1
 let g:neobundle#enable_fuzzy_completion = 1
@@ -222,7 +214,6 @@ let g:neocomplete#enable_prefetch = 1
 let g:neocomplete#auto_completion_start_length = 2
 let g:neocomplete#enable_auto_close_preview = 1
 
-" Define keyword.
 if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
 endif
@@ -231,8 +222,6 @@ let g:neocomplete#keyword_patterns['default'] = '\h\w*'
 if !exists('g:neocomplete#sources#omni#input_patterns')
 	let g:neocomplete#sources#omni#input_patterns = {}
 endif
-
-"let g:neocomplete#force_omni_input_patterns.javascript = '[^. \t]\.\w*'
 
 " neocomplete key-mappings.
 inoremap <expr><C-g> neocomplete#undo_completion()
@@ -261,7 +250,7 @@ nnoremap <C-P> :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/asyn
 let g:unite_source_grep_command = 'ag'
 let g:unite_source_grep_default_opts = '--line-numbers --nocolor --nogroup --smart-case'
 let g:unite_source_grep_recursive_opt = ''
-nnoremap <Leader>/ :<C-u>Unite -silent -buffer-name=ag grep:.<CR>
+nnoremap <C-T> :<C-u>Unite -silent -buffer-name=ag grep:.<CR>
 
 " When buffer/file is unite, add new mappings
 autocmd FileType unite call s:unite_settings()
