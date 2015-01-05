@@ -137,7 +137,14 @@ nmap <silent> <A-l> :wincmd l<CR>
 "Set up folding
 augroup folding
 	au BufReadPre * setlocal foldmethod=indent
-	au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+	au BufReadPre javascript setlocal foldmethod=syntax
+	"au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
+	set foldtext=MyFoldText()
+	function MyFoldText()
+		let line = getline(v:foldstart)
+		let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
+		return '+ ----' . sub
+	endfunction
 augroup END
 
 " Quick access to buffer search

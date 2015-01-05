@@ -26,6 +26,7 @@ add_filetypes_to_ls_colors(){
 			"*.cpp"
 			"*.hx"
 			"*.rb"
+			"*.cs"
 			);
 
 	task_build_color="0;35";
@@ -93,7 +94,7 @@ set_default_ls_colors(){
 	set +f; #turn on globbing
 }
 
-set_default_ls_colors;
+set_presentation_ls_colors;
 
 alias ls='ls --color=auto';
 alias l='ls --color=auto';
