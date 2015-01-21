@@ -51,6 +51,8 @@ NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'Chiel92/vim-autoformat'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'flazz/vim-colorschemes'
+NeoBundle 'jdonaldson/vaxe'
+
 
 call neobundle#end()
 
@@ -147,17 +149,27 @@ augroup folding
 	endfunction
 augroup END
 
+"make space toggle folds
+nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
+vnoremap <Space> zf
+"Keybind toggle folding
+nmap <silent> <A-f> zi
+imap <silent> <A-f> <ESC>zii
+
 " Quick access to buffer search
 map <leader>, :buffer<Space>
 noremap <C-h> :bp<CR>
 noremap <C-l> :bn<CR>
 noremap <C-d> :bd<CR>
 
-"make space toggle folds
-nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
-vnoremap <Space> zf
+" Make shift-tab normal.
+imap <S-TAB> <Esc><<i
 
 """"""""""""""""""""""""""" PLUGIN SETTINGS """"""""""""""""""""""""""""""""""
+
+"" Nerd Commenter mappings
+nmap <C-_> <Leader>c<Space>
+
 "" Airline Settings
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
 let g:airline_theme = 'zenburn'
@@ -168,6 +180,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_enable_syntastic = 1
+let g:airline_enable_vaxe = 0
 
 "" NERDTree configuration
 let g:NERDTreeChDirMode=2
@@ -179,15 +192,23 @@ let g:NERDTreeMapOpenInTabSilent = '<RightMouse>'
 let g:NERDTreeWinSize = 20
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
 map <leader>n :NERDTreeToggle<CR>
+map <leader>f :NERDTreeFind<CR>
 map <leader>m :NERDTreeMirror<CR>
 
 " Disable conceal
 let g:vim_json_syntax_conceal = 0
 
 " Autoformat Settings
-noremap <C-=> :Autoformat<CR><CR>
-inoremap <C-=> <ESC>:Autoformat<CR><CR>i
-let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8z2s".&shiftwidth'
+noremap <C-=> :Autoformat<CR>
+inoremap <C-=> <ESC>:Autoformat<CR>i
+let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8s".&shiftwidth'
+"let g:formatprg_haxe = "astyle"
+"let g:formatprg_args_expr_haxe = '"--mode=c --lineend=linux -jxepCA8s".&shiftwidth'
+
+
+"vaxe settings
+let g:vaxe_enable_airline_defaults=0
+let g:vaxe_lime_target='flash'
 
 " Syntastic Settings
 autocmd BufEnter * :syntax sync fromstart
@@ -200,26 +221,19 @@ let g:syntastic_style_error_symbol = 'X'
 let g:syntastic_style_warning_symbol = '!'
 let g:syntastic_aggregate_errors = 1
 
-" set up omnifuncs
-au FileType css setlocal omnifunc=csscomplete#CompleteCSS
-au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-au FileType python setlocal omnifunc=pythoncomplete#Complete
-au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-au FileType haxe setlocal omnifunc=vaxe#HaxeComplete
-au FileType * setlocal omnifunc=syntaxcomplete#Complete
-
 " Neocomplete Settings
 let g:acp_enableAtStartup = 0
 let g:neocomplete#enable_at_startup = 1
 let g:neobundle#enable_fuzzy_completion = 1
 let g:neocomplete#data_directory = '~/tmp/.neocomplete'
 let g:neocomplete#enable_smart_case = 1
+let g:neocomplete#enable_camel_case = 1
 let g:neocomplete#sources#syntax#min_keyword_length = 3
 let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 let g:neocomplete#enable_prefetch = 1
 let g:neocomplete#auto_completion_start_length = 2
 let g:neocomplete#enable_auto_close_preview = 1
+let g:neocomplete#use_vimproc = 2
 
 if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
@@ -230,15 +244,44 @@ if !exists('g:neocomplete#sources#omni#input_patterns')
 	let g:neocomplete#sources#omni#input_patterns = {}
 endif
 
+if !exists('g:neocomplete#sources')
+	let g:neocomplete#sources = {}
+endif
+"let g:neocomplete#sources._ = ['unite_complete']
+
+" set up omnifuncs
+au FileType css setlocal omnifunc=csscomplete#CompleteCSS
+au FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+au FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+au FileType python setlocal omnifunc=pythoncomplete#Complete
+au FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+au FileType haxe setlocal omnifunc=vaxe#HaxeComplete
+au FileType * setlocal omnifunc=syntaxcomplete#Complete
+
 " neocomplete key-mappings.
 inoremap <expr><C-g> neocomplete#undo_completion()
 inoremap <expr><C-l> neocomplete#complete_common_string()
 inoremap <expr><CR> pumvisible() ? "\<C-y>" : "\<CR>"
 inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
 inoremap <expr><C-y> neocomplete#close_popup()
 inoremap <expr><C-e> neocomplete#cancel_popup()
+
+" neosnippets mappings
+" SuperTab like snippets behavior.
+imap <expr><CR> neosnippet#expandable_or_jumpable() ?
+			\ "\<Plug>(neosnippet_expand_or_jump)"
+			\: pumvisible() ? "\<C-y>" : "\<CR>"
+smap <expr><CR> neosnippet#expandable_or_jumpable() ?
+			\ "\<Plug>(neosnippet_expand_or_jump)"
+			\: "\<CR>"
+
+" For snippet_complete marker.
+if has('conceal')
+	set conceallevel=2 concealcursor=i
+endif
 
 " Unite Settings
 let g:unite_enable_start_insert = 1
@@ -251,7 +294,8 @@ call unite#filters#matcher_default#use(['matcher_fuzzy'])
 call unite#filters#sorter_default#use(['sorter_rank'])
 
 " Replace ctrlp
-nnoremap <C-P> :<C-u>Unite -buffer-name=files -start-insert buffer file_rec/async:!<cr>
+nnoremap <C-p> :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
+"nnoremap <C-S-p> :<C-u>Unite -buffer-name=buffers -start-insert buffer<cr>
 
 "search content
 let g:unite_source_grep_command = 'ag'

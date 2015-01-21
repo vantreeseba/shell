@@ -1,11 +1,11 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
+#~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
 # If not running interactively, don't do anything
 case $- in
-  *i*) ;;
-     *) return;;
+	*i*) ;;
+	*) return;;
 esac
 
 # don't put duplicate lines or lines starting with space in the history.
@@ -30,108 +30,53 @@ shopt -s checkwinsize
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
 #shopt -s globstar #only available in bash 4.0 I think.
-shopt -s extglob
+shopt -s extglob;
+
+Reset='\[\e[00m\]';
+
+# Dark Colors
+Red='\[\e[0;31m\]';         # Red
+Green='\[\e[0;32m\]';       # Green
+Yellow='\[\e[0;33m\]';      # Yellow
+Blue='\[\e[0;34m\]';        # Blue
+Purple='\[\e[0;35m\]';      # Purple
+Cyan='\[\e[0;36m\]';        # Cyan
+White='\[\e[0;37m\]';       # White
+
+#Bright colors
+BRed='\[\e[1;31m\]';         # Red
+BGreen='\[\e[1;32m\]';       # Green
+BYellow='\[\e[1;33m\]';      # Yellow
+BBlue='\[\e[1;34m\]';        # Blue
+BPurple='\[\e[1;35m\]';      # Purple
+BCyan='\[\e[1;36m\]';        # Cyan
+BWhite='\[\e[1;37m\]';       # White
 
 set_prompt () {
-	ExitStatus=$?
+	local ExitStatus=$?;
 
-	Reset='\[\e[00m\]'
-	# Regular Colors
-	Red='\[\e[0;31m\]'          # Red
-	Green='\[\e[0;32m\]'        # Green
-	Yellow='\[\e[0;33m\]'       # Yellow
-	Blue='\[\e[0;34m\]'         # Blue
-	Purple='\[\e[0;35m\]'       # Purple
-	Cyan='\[\e[0;36m\]'         # Cyan
-	White='\[\e[0;37m\]'        # White
+	PS1="\n"$Yellow"\w";
 
-	function get_upstream_diff {
-		# Find how many commits we are ahead/behind our upstream
-
-		local upstream=$(git rev-parse --abbrev-ref ${parsed_branch}@{upstream})
-		local count="$(git rev-list --count --left-right ${upstream}...HEAD 2>/dev/null)"
-		local ahead="${count:(-1)}"
-		local behind="${count:0:1}"
-
-		# calculate the result
-		case "$count" in
-		"") # no upstream
-			diff="" ;;
-		0*0) # equal to upstream
-			diff="=" ;;
-		0*) # ahead of upstream
-			diff="$Green+${ahead}" ;;
-		*"  0") # behind upstream
-			diff="$Yellowe-${behind}" ;;
-		*)      # diverged from upstream
-			diff="$Red+${ahead}-${behind}" ;;
-		esac
-
-		echo $diff
-	}
-
-	function parse_git_dirty {
-		#changes in index
-
-		output=""
-
-		git diff-index --cached --quiet --diff-filter=A HEAD 2>/dev/null
-		if [[ $? != 0 ]]; then
-			output="$output$Green+"
-		fi
-
-		git diff-index --cached --quiet --diff-filter=M HEAD 2>/dev/null
-		if [[ $? != 0 ]]; then
-			output="$output$Green*"
-		fi
-
-		git diff --quiet 2>/dev/null
-		if [[ $? != 0 ]]; then
-			output="$output$Yellow*"
-		fi
-
-		if [[ $(git ls-files --exclude-standard --others 2>/dev/null) != "" ]]; then
-			output="$output${Yellow}+"
-		fi
-
-		if [ $output ]; then
-			echo -n " $output"
-		fi
-	}
-
-	function parse_git_branch {
-	  git rev-parse --abbrev-ref HEAD 2>/dev/null
-	}
-
-	function display_git_status {
-		parsed_branch=$(parse_git_branch)
-		if [[ $parsed_branch ]]; then
-			parsed_branch="${parsed_branch}"
-#            upstream_diff=$(get_upstream_diff)
-#           dirty_status=$(parse_git_dirty)
-#echo "${Reset} [${Yellow}${parsed_branch}${dirty_status}${Reset}]"
-echo "${Reset} [${Yellow}${parsed_branch}${Reset}]"
-		fi
-	}
-
-	PS1="\n"
-	Host="\\h"
-	UserAtHost="\\u@\\h"
-	ShortDir="\\w"
+	#if [[ -d .git || current_branch=``]]; then
+	current_branch=`git rev-parse --abbrev-ref HEAD 2>/dev/null`
+	if [[ $current_branch ]]; then
+		PS1+=$Yellow$Reset" ["$Purple$current_branch$Reset"]";
+	fi
+	#fi
 
 	if [[ $EUID == 0 ]]; then
-		ExecuteSymbol="$Red#"
-	 else
-		ExecuteSymbol="$Green>"
+		ExecuteSymbol=$Red"#";
+	else
+		ExecuteSymbol=$Green">";
 	fi
 
-	PS1+="${Yellow}${ShortDir}$(display_git_status)\n"
+	PS1+="\n"
 
 	if [[ $ExitStatus != 0 ]]; then
-		PS1+="${Red}${ExitStatus}"
+		PS1+=$Red$ExitStatus
 	fi
 
-	PS1+="${ExecuteSymbol}${Reset}"
+	PS1+=$ExecuteSymbol$Reset
 }
 
 PROMPT_COMMAND='set_prompt'
@@ -154,15 +99,15 @@ fi
 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
 # sources /etc/bash.bashrc).
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-	. /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-	. /etc/bash_completion
-  fi
+	if [ -f /usr/share/bash-completion/bash_completion ]; then
+		. /usr/share/bash-completion/bash_completion
+	elif [ -f /etc/bash_completion ]; then
+		. /etc/bash_completion
+	fi
 
-  if [ -f /etc/git-completion.bash ]; then
-	. /etc/git-completion.bash
-  fi
+	if [ -f /etc/git-completion.bash ]; then
+		. /etc/git-completion.bash
+	fi
 fi
 
 # Deal with history in multiple terminals
