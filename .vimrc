@@ -106,6 +106,13 @@ map <down> <C-W>-
 map <left> <C-W><
 map <right> <C-W>>
 
+"Add larger paging for vertical movement
+nnoremap J 5j
+nnoremap K 5k
+xnoremap J 5j
+xnoremap K 5k
+
+
 " set up a longer history
 set history=250
 set undolevels=250
@@ -233,7 +240,7 @@ let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
 let g:neocomplete#enable_prefetch = 1
 let g:neocomplete#auto_completion_start_length = 2
 let g:neocomplete#enable_auto_close_preview = 1
-let g:neocomplete#use_vimproc = 2
+let g:neocomplete#use_vimproc = 4
 
 if !exists('g:neocomplete#keyword_patterns')
 	let g:neocomplete#keyword_patterns = {}
