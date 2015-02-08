@@ -1,3 +1,5 @@
+" vim:fdm=marker
+" ConEmu specific Settings {{{
 if !empty($CONEMUBUILD)
 	" 256 color terminal is possible in Windows using ConEmu
 	set term=xterm
@@ -10,8 +12,8 @@ if !empty($CONEMUBUILD)
 	let &t_us="\e[4m"       " start underline
 	let &t_ue="\e[24m"      " end underline
 endif
-
-"NeoBundle Scripts-----------------------------
+" }}}
+" NeoBundle Settings {{{
 if has('vim_starting')
 	set runtimepath+=~/.vim/bundle/neobundle.vim/
 endif
@@ -54,53 +56,59 @@ NeoBundle 'flazz/vim-colorschemes'
 NeoBundle 'jdonaldson/vaxe'
 NeoBundle 'fidian/hexmode'
 
-
 call neobundle#end()
 
 " If there are uninstalled bundles found on startup,
 " this will conveniently prompt you to install them.
 NeoBundleCheck
-"End NeoBundle Scripts-------------------------
-
-" Set colorscheme so other settings can override later
+" }}}
+" VIM Settings {{{
+set mouse=a " Enable mouse in all modes
 colorscheme monokai
 
-" Pop out of insert and visual modes easily
-imap jj <Esc>
-vmap vv <Esc>
+let mapleader="," 	"Set the leader key to baus status
+set number 			" Show line numbers
 
-"Set the leader key to baus status
-let mapleader=","
-
-" Show line numbers
-set number
-
-" hide buffers instead of closing and forcing a save
-set hidden
+set autochdir 	" set PWD to current opened buffers pwd
+set hidden 		" Hide buffers instead of closing and forcing save
 set nobackup
 set noswapfile
 
-" Highlight search results && hightlight as you type
-set hlsearch
-set incsearch
+set hlsearch    " Highlight search reasults
+set incsearch   " Highlight as you type
 set ignorecase
 set smartcase
 
-" Encoding
-set bomb
-set ttyfast
+set ttyfast " Tell vim to expect a fast terminal
 
-" Fat finger fixes
-cnoreabbrev W! w!
-cnoreabbrev Q! q!
-cnoreabbrev Wq wq
-cnoreabbrev Wa wa
-cnoreabbrev wQ wq
-cnoreabbrev WQ wq
-cnoreabbrev W w
-cnoreabbrev Q q
+set history=250 " set up a longer history
+set undolevels=250 "set up longer undo history
+set visualbell
+set noerrorbells
+syntax on
+filetype plugin indent on
 
-" Disable the arrow keys like a baus.
+set nowrap 			" turn off line wrap
+set colorcolumn=80 	" put a color column at 80 chars
+set cindent			" sets c style indentation for all files
+set noexpandtab shiftwidth=4 tabstop=4
+
+set modeline
+set ls=2
+set modelines=10
+set title
+set titleold="Terminal"
+set titlestring=%F
+
+augroup folding
+	au BufReadPre * setlocal foldmethod=indent
+	au BufReadPre javascript setlocal foldmethod=syntax
+augroup END
+
+" }}}
+" Key Mappings {{{
+
+" Disable the arrow keys like a baus, instead they change window size
 map <up> <C-W>+
 map <down> <C-W>-
 map <left> <C-W><
@@ -112,84 +120,70 @@ nnoremap K 5k
 xnoremap J 5j
 xnoremap K 5k
 
-
-" set up a longer history
-set history=250
-set undolevels=250
-set visualbell
-set noerrorbells
-
-" Enable syntax
-syntax on
-filetype plugin indent on
-
-" Nice settings
-set nowrap 			" turn off line wrap
-set colorcolumn=80 	" put a color column at 80 chars
-set cindent			" sets c style indentation for all files
-set noexpandtab shiftwidth=4 tabstop=4
-
-" Always display file name
-set modeline
-set ls=2
-set modelines=10
-set title
-set titleold="Terminal"
-set titlestring=%F
-
 " map some window movements (ALT + movments)
 nmap <silent> <A-k> :wincmd k<CR>
 nmap <silent> <A-j> :wincmd j<CR>
 nmap <silent> <A-h> :wincmd h<CR>
 nmap <silent> <A-l> :wincmd l<CR>
 
-"Set up folding
-augroup folding
-	au BufReadPre * setlocal foldmethod=indent
-	au BufReadPre javascript setlocal foldmethod=syntax
-	"au BufWinEnter * if &fdm == 'indent' | setlocal foldmethod=manual | endif
-	set foldtext=MyFoldText()
-	function MyFoldText()
-		let line = getline(v:foldstart)
-		let sub = substitute(line, '/\*\|\*/\|{{{\d\=', '', 'g')
-		return '+ ----' . sub
-	endfunction
-augroup END
+" Pop out of insert and visual modes easily
+imap jk <Esc>
+imap kj <Esc>
+vmap vv <Esc>
+
+" Fat finger fixes
+cnoreabbrev W! w!
+cnoreabbrev Q! q!
+cnoreabbrev Wq wq
+cnoreabbrev Wa wa
+cnoreabbrev wQ wq
+cnoreabbrev WQ wq
+cnoreabbrev W w
+cnoreabbrev Q q
 
 "make space toggle folds
 nnoremap <silent> <Space> @=(foldlevel('.')?'za':'\<Space>')<CR>
 vnoremap <Space> zf
+
 "Keybind toggle folding
 nmap <silent> <A-f> zi
 imap <silent> <A-f> <ESC>zii
 
-" Quick access to buffer search
-map <leader>, :buffer<Space>
+"Buffer movenments.
 noremap <C-h> :bp<CR>
 noremap <C-l> :bn<CR>
 noremap <C-d> :bd<CR>
 
 " Make shift-tab normal.
 imap <S-TAB> <Esc><<i
-
-""""""""""""""""""""""""""" PLUGIN SETTINGS """"""""""""""""""""""""""""""""""
+" }}}
+" PLUGIN SETTINGS {{{
 
 "" Nerd Commenter mappings
-nmap <C-_> <Leader>c<Space>
+nmap <C-/> <Leader>c<Space>
+vmap <C-/> <Leader>c<Space>
 
-"" Airline Settings
-set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
-let g:airline_theme = 'zenburn'
-let g:airline_enable_branch = 1
-let g:airline_left_sep = ""
-let g:airline_right_sep = ""
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline_enable_syntastic = 1
-let g:airline_enable_vaxe = 0
+" Autoformat Settings
+noremap <C-=> :Autoformat<CR>
+inoremap <C-=> <ESC>:Autoformat<CR>i
+let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8s".&shiftwidth'
 
-"" NERDTree configuration
+"vaxe settings
+let g:vaxe_enable_airline_defaults=0
+let g:vaxe_lime_target='flash'
+
+" Syntastic Settings {{{
+autocmd BufEnter * :syntax sync fromstart
+set autoread
+let g:syntastic_javascript_checkers = ['jshint']
+let g:syntastic_always_populate_loc_list=1
+let g:syntastic_error_symbol='X'
+let g:syntastic_warning_symbol='!'
+let g:syntastic_style_error_symbol = 'X'
+let g:syntastic_style_warning_symbol = '!'
+let g:syntastic_aggregate_errors = 1
+" }}}
+"" NERDTree configuration {{{
 let g:NERDTreeChDirMode=2
 let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
 let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
@@ -201,34 +195,20 @@ set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*.pyc,*.db,*.sqlite
 map <leader>n :NERDTreeToggle<CR>
 map <leader>f :NERDTreeFind<CR>
 map <leader>m :NERDTreeMirror<CR>
-
-" Disable conceal
-let g:vim_json_syntax_conceal = 0
-
-" Autoformat Settings
-noremap <C-=> :Autoformat<CR>
-inoremap <C-=> <ESC>:Autoformat<CR>i
-let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8s".&shiftwidth'
-"let g:formatprg_haxe = "astyle"
-"let g:formatprg_args_expr_haxe = '"--mode=c --lineend=linux -jxepCA8s".&shiftwidth'
-
-
-"vaxe settings
-let g:vaxe_enable_airline_defaults=0
-let g:vaxe_lime_target='flash'
-
-" Syntastic Settings
-autocmd BufEnter * :syntax sync fromstart
-set autoread
-let g:syntastic_javascript_checkers = ['jshint']
-let g:syntastic_always_populate_loc_list=1
-let g:syntastic_error_symbol='X'
-let g:syntastic_warning_symbol='!'
-let g:syntastic_style_error_symbol = 'X'
-let g:syntastic_style_warning_symbol = '!'
-let g:syntastic_aggregate_errors = 1
-
-" Neocomplete Settings
+" }}}
+"" Airline Settings {{{
+set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
+let g:airline_theme = 'zenburn'
+let g:airline_enable_branch = 1
+let g:airline_left_sep = ""
+let g:airline_right_sep = ""
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = '|'
+let g:airline_enable_syntastic = 1
+let g:airline_enable_vaxe = 0
+" }}}
+" Neocomplete Settings {{{
 let g:acp_enableAtStartup = 0
 let g:neocomplete#enable_at_startup = 1
 let g:neobundle#enable_fuzzy_completion = 1
@@ -290,7 +270,8 @@ if has('conceal')
 	set conceallevel=2 concealcursor=i
 endif
 
-" Unite Settings
+" }}}
+" Unite Settings {{{
 let g:unite_enable_start_insert = 1
 let g:unite_split_rule = "botright"
 let g:unite_force_overwrite_statusline = 0
@@ -321,7 +302,8 @@ function! s:unite_settings()
 
 	nmap <buffer> <ESC> <Plug>(unite_exit)
 endfunction
-
+" }}}
+" MultiCursor Settings {{{
 " Called before selecting multiple cursors to keep neocomplete from derping
 function! Multiple_cursors_before()
 	if exists(':NeoCompleteLock')==2
@@ -335,5 +317,5 @@ function! Multiple_cursors_after()
 		exe 'NeoCompleteUnlock'
 	endif
 endfunction
-
-set mouse=a
+" }}}
+" }}}
