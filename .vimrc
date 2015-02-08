@@ -52,6 +52,7 @@ NeoBundle 'Chiel92/vim-autoformat'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'flazz/vim-colorschemes'
 NeoBundle 'jdonaldson/vaxe'
+NeoBundle 'fidian/hexmode'
 
 
 call neobundle#end()
@@ -88,7 +89,6 @@ set smartcase
 " Encoding
 set bomb
 set ttyfast
-set binary
 
 " Fat finger fixes
 cnoreabbrev W! w!
