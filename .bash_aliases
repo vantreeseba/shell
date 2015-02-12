@@ -35,12 +35,15 @@ add_filetypes_to_ls_colors(){
 			"*Gemfile"
 			"*Gemfile.lock"
 			"*gulpfile.js"
+			"*newrelic.js"
 			"*.hxml"
+			"*project.xml"
 			);
 
 	key_value_color="0;33";
 	key_value_files=(
-			"*.json"
+			"*.json",
+			"*.yml"
 			);
 
 	hidden_config_color="1;33";
@@ -96,5 +99,6 @@ set_default_ls_colors(){
 
 set_presentation_ls_colors;
 
+alias la='ls -lah --color=auto';
 alias ls='ls --color=auto';
 alias l='ls --color=auto';

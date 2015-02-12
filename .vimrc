@@ -100,6 +100,8 @@ set title
 set titleold="Terminal"
 set titlestring=%F
 
+set updatetime=1000
+
 augroup folding
 	au BufReadPre * setlocal foldmethod=indent
 	au BufReadPre javascript setlocal foldmethod=syntax
@@ -119,6 +121,10 @@ nnoremap J 5j
 nnoremap K 5k
 xnoremap J 5j
 xnoremap K 5k
+
+"Add mappings for not stupid start and end of line
+nnoremap H 0
+nnoremap L $
 
 " map some window movements (ALT + movments)
 nmap <silent> <A-k> :wincmd k<CR>
@@ -174,6 +180,7 @@ let g:vaxe_lime_target='flash'
 
 " Syntastic Settings {{{
 autocmd BufEnter * :syntax sync fromstart
+autocmd CursorHold * :SyntasticCheck
 set autoread
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_always_populate_loc_list=1
@@ -182,6 +189,10 @@ let g:syntastic_warning_symbol='!'
 let g:syntastic_style_error_symbol = 'X'
 let g:syntastic_style_warning_symbol = '!'
 let g:syntastic_aggregate_errors = 1
+"let g:syntastic_mode_map = {
+        "\ "mode": "active",
+        "\ "active_filetypes": [],
+        "\ "passive_filetypes": [] }
 " }}}
 "" NERDTree configuration {{{
 let g:NERDTreeChDirMode=2
