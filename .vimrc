@@ -63,10 +63,14 @@ call neobundle#end()
 NeoBundleCheck
 " }}}
 " VIM Settings {{{
+"set shell=C:\Progra~2\Git\bin\bash.exe
+"set shellcmdflag=-lic
+"set shellxquote=\"
+
 set mouse=a " Enable mouse in all modes
 colorscheme monokai
 
-let mapleader="," 	"Set the leader key to baus status
+let mapleader=',' 	"Set the leader key to baus status
 set number 			" Show line numbers
 
 set autochdir 	" set PWD to current opened buffers pwd
@@ -194,7 +198,7 @@ let g:syntastic_aggregate_errors = 1
         "\ "active_filetypes": [],
         "\ "passive_filetypes": [] }
 " }}}
-"" NERDTree configuration {{{
+" NERDTree configuration {{{
 let g:NERDTreeChDirMode=2
 let g:NERDTreeIgnore=['\.rbc$', '\~$', '\.pyc$', '\.db$', '\.sqlite$', '__pycache__']
 let g:NERDTreeSortOrder=['^__\.py$', '\/$', '*', '\.swp$', '\.bak$', '\~$']
@@ -207,9 +211,9 @@ map <leader>n :NERDTreeToggle<CR>
 map <leader>f :NERDTreeFind<CR>
 map <leader>m :NERDTreeMirror<CR>
 " }}}
-"" Airline Settings {{{
+" Airline Settings {{{
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
-let g:airline_theme = 'zenburn'
+"let g:airline_theme = 'zenburn'
 let g:airline_enable_branch = 1
 let g:airline_left_sep = ""
 let g:airline_right_sep = ""
@@ -217,7 +221,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
 let g:airline_enable_syntastic = 1
-let g:airline_enable_vaxe = 0
+"let g:airline_enable_vaxe = 0
 " }}}
 " Neocomplete Settings {{{
 let g:acp_enableAtStartup = 0
