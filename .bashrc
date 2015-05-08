@@ -8,10 +8,6 @@ case $- in
 	*) return;;
 esac
 
-export GIT_EDITOR=vim
-export EDITOR=vim
-export VISUAL=vim
-
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -119,3 +115,5 @@ fi
 export HISTCONTROL=ignoredups:erasedups
 # append history entries..
 shopt -s histappend
+
+export GIT_EDITOR="'c:/Program Files (x86)/Git/share/vim/vim74/vim.exe'"

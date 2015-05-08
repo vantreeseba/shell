@@ -11,6 +11,14 @@ if !empty($CONEMUBUILD)
 	let &t_ZR="\e[23m"      " end italics
 	let &t_us="\e[4m"       " start underline
 	let &t_ue="\e[24m"      " end underline
+
+	" let mouse wheel scroll file contents
+	if !has("gui_running")
+		inoremap <Esc>[62~ <C-X><C-E>
+		inoremap <Esc>[63~ <C-X><C-Y>
+		nnoremap <Esc>[62~ <C-E>
+		nnoremap <Esc>[63~ <C-Y>
+	endif
 endif
 " }}}
 " NeoBundle Settings {{{
@@ -48,13 +56,17 @@ NeoBundle 'scrooloose/syntastic'
 NeoBundle 'scrooloose/nerdcommenter'
 NeoBundle 'kristijanhusak/vim-multiple-cursors'
 NeoBundle 'bling/vim-airline'
+NeoBundle 'jdonaldson/vaxe' " Load before polyglot
 NeoBundle 'sheerun/vim-polyglot'
 NeoBundle 'editorconfig/editorconfig-vim'
 NeoBundle 'Chiel92/vim-autoformat'
 NeoBundle 'airblade/vim-gitgutter'
 NeoBundle 'flazz/vim-colorschemes'
-NeoBundle 'jdonaldson/vaxe'
 NeoBundle 'fidian/hexmode'
+NeoBundle 'Raimondi/delimitMate'
+NeoBundle 'tpope/vim-dispatch'
+NeoBundle 'mattn/emmet-vim'
+NeoBundle 'vantreeseba/workflowish'
 
 call neobundle#end()
 
@@ -83,6 +95,7 @@ set incsearch   " Highlight as you type
 set ignorecase
 set smartcase
 
+set nocompatible
 set ttyfast " Tell vim to expect a fast terminal
 
 set history=250 " set up a longer history
@@ -104,11 +117,18 @@ set title
 set titleold="Terminal"
 set titlestring=%F
 
-set updatetime=1000
+set updatetime=1000 "make cursorhold only trigger after a one second pause
 
 augroup folding
+	au!
 	au BufReadPre * setlocal foldmethod=indent
-	au BufReadPre javascript setlocal foldmethod=syntax
+	au BufReadPre *.js setlocal foldmethod=syntax
+	"au BufReadPre *.hx setlocal foldmethod=syntax
+augroup END
+
+augroup make_commands
+	"au!
+	"au BufReadPre *.hx setlocal makeprg=gulp
 augroup END
 
 " }}}
@@ -160,8 +180,8 @@ nmap <silent> <A-f> zi
 imap <silent> <A-f> <ESC>zii
 
 "Buffer movenments.
-noremap <C-h> :bp<CR>
-noremap <C-l> :bn<CR>
+noremap <C-j> :bp<CR>
+noremap <C-k> :bn<CR>
 noremap <C-d> :bd<CR>
 
 " Make shift-tab normal.
@@ -169,9 +189,21 @@ imap <S-TAB> <Esc><<i
 " }}}
 " PLUGIN SETTINGS {{{
 
+" For snippet_complete marker.
+if has('conceal')
+	set conceallevel=2 concealcursor=i
+endif
+
+"" Emmet Settings
+
+"" Dispatch Mappings
+nnoremap <F9> :Dispatch<CR>
+nnoremap <C-b> :Dispatch<CR>
+
 "" Nerd Commenter mappings
 nmap <C-/> <Leader>c<Space>
 vmap <C-/> <Leader>c<Space>
+imap <C-/> <ESC><Leader>c<Space><CR>i
 
 " Autoformat Settings
 noremap <C-=> :Autoformat<CR>
@@ -179,24 +211,29 @@ inoremap <C-=> <ESC>:Autoformat<CR>i
 let g:formatprg_args_expr_cpp = '"--mode=c -jxepCA8s".&shiftwidth'
 
 "vaxe settings
-let g:vaxe_enable_airline_defaults=0
 let g:vaxe_lime_target='flash'
-
+let g:vaxe_prefer_openfl="project.xml"
+let g:vaxe_prefer_hxml="./*/*.hxml"
+let g:vaxe_default_parent_search_patterns=[g:vaxe_prefer_openfl, g:vaxe_prefer_hxml, '*.hxml']
 " Syntastic Settings {{{
-autocmd BufEnter * :syntax sync fromstart
-autocmd CursorHold * :SyntasticCheck
+augroup syntastic
+	au!
+	au BufEnter * :syntax sync fromstart
+	au CursorHold * :SyntasticCheck
+augroup END
+
 set autoread
 let g:syntastic_javascript_checkers = ['jshint']
 let g:syntastic_always_populate_loc_list=1
 let g:syntastic_error_symbol='X'
 let g:syntastic_warning_symbol='!'
-let g:syntastic_style_error_symbol = 'X'
-let g:syntastic_style_warning_symbol = '!'
+let g:syntastic_style_error_symbol = 'x'
+let g:syntastic_style_warning_symbol = '?'
 let g:syntastic_aggregate_errors = 1
 "let g:syntastic_mode_map = {
-        "\ "mode": "active",
-        "\ "active_filetypes": [],
-        "\ "passive_filetypes": [] }
+"\ "mode": "active",
+"\ "active_filetypes": [],
+"\ "passive_filetypes": [] }
 " }}}
 " NERDTree configuration {{{
 let g:NERDTreeChDirMode=2
@@ -213,15 +250,16 @@ map <leader>m :NERDTreeMirror<CR>
 " }}}
 " Airline Settings {{{
 set statusline=%F%m%r%h%w%=(%{&ff}/%Y)\ (line\ %l\/%L,\ col\ %c)\ %{fugitive#statusline()}
-"let g:airline_theme = 'zenburn'
-let g:airline_enable_branch = 1
+let g:airline_theme = 'zenburn'
 let g:airline_left_sep = ""
 let g:airline_right_sep = ""
 let g:airline#extensions#tabline#enabled = 1
 let g:airline#extensions#tabline#left_sep = ' '
 let g:airline#extensions#tabline#left_alt_sep = '|'
-let g:airline_enable_syntastic = 1
-"let g:airline_enable_vaxe = 0
+let g:airline#extensions#branch#enabled = 1
+let g:airline#extensions#syntastic#enabled = 1
+"let g:airline_powerline_fonts = 1
+let g:airline_enable_vaxe = 1
 " }}}
 " Neocomplete Settings {{{
 let g:acp_enableAtStartup = 0
@@ -298,7 +336,6 @@ call unite#filters#sorter_default#use(['sorter_rank'])
 
 " Replace ctrlp
 nnoremap <C-p> :<C-u>Unite -buffer-name=files -start-insert file_rec/async:!<cr>
-"nnoremap <C-S-p> :<C-u>Unite -buffer-name=buffers -start-insert buffer<cr>
 
 "search content
 let g:unite_source_grep_command = 'ag'
@@ -309,7 +346,7 @@ nnoremap <C-T> :<C-u>Unite -silent -buffer-name=ag grep:.<CR>
 " When buffer/file is unite, add new mappings
 autocmd FileType unite call s:unite_settings()
 function! s:unite_settings()
-	imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+	imap <buffer> <C-j> <Plug>(unite_select_next_line)
 	imap <buffer> <C-k> <Plug>(unite_select_previous_line)
 	imap <silent><buffer><expr> <C-x> unite#do_action('split')
 	imap <silent><buffer><expr> <C-v> unite#do_action('vsplit')

@@ -60,6 +60,7 @@ add_filetypes_to_ls_colors(){
 
 	marked_up_text_color="0;32";
 	marked_up_text_files=(
+			"*LICENSE"
 			"*.md"
 			"*.htm"
 			"*.html"
@@ -72,7 +73,6 @@ add_filetypes_to_ls_colors(){
 	add_to_ls_colors "hidden_config_files[@]" $hidden_config_color;
 	add_to_ls_colors "marked_up_text_files[@]" $marked_up_text_color;
 }
-
 
 set_presentation_ls_colors(){
 	set -f; #turn off globbing
@@ -102,3 +102,7 @@ set_presentation_ls_colors;
 alias la='ls -lah --color=auto';
 alias ls='ls --color=auto';
 alias l='ls --color=auto';
+
+alias git='hub';
+alias sb='start chrome';
+alias open='start';
